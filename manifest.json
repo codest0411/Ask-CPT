@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Ask CPT",
+  "version": "1.0",
+  "description": "Your ultimate AI Coding Assistant for solving algorithm problems in real-time.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://openrouter.ai/api/v1/*",
+    "https://api.groq.com/*",
+    "https://api.openai.com/*",
+    "https://api.together.xyz/*",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://leetcode.com/*",
+        "*://*.leetcode.com/*"
+      ],
+      "js": ["config.js", "domParser.js", "aiClient.js", "ui.js", "content.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["editorWriter.js"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
+}
