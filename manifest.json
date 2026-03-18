@@ -40,7 +40,14 @@
     {
       "matches": [
         "*://leetcode.com/*",
-        "*://*.leetcode.com/*"
+        "*://*.leetcode.com/*",
+        "*://*.hackerrank.com/*",
+        "*://*.codeforces.com/*",
+        "*://*.geeksforgeeks.org/*",
+        "*://*.coderbyte.com/*",
+        "*://*.codesignal.com/*",
+        "*://*.hackerearth.com/*",
+        "*://*.codewars.com/*"
       ],
       "js": [
         "config.js",

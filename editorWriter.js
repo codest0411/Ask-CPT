@@ -45,7 +45,21 @@
       return true;
     }
 
-    // 2. Try Generic Editor (Textarea)
+    // 2. Try Ace Editor (HackerRank, etc.)
+    const aceEl = document.querySelector('.ace_editor');
+    if (aceEl && aceEl.env && aceEl.env.editor) {
+      aceEl.env.editor.setValue(code);
+      return true;
+    }
+
+    // 3. Try CodeMirror Editor (Codeforces, etc.)
+    const cmEl = document.querySelector('.CodeMirror');
+    if (cmEl && cmEl.CodeMirror) {
+      cmEl.CodeMirror.setValue(code);
+      return true;
+    }
+
+    // 4. Try Generic Editor (Textarea)
     const activeTextarea = document.querySelector('textarea:focus-within') ||
       document.querySelector('.monaco-editor textarea') ||
       document.querySelector('textarea');

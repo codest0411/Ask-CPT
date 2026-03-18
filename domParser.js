@@ -31,7 +31,9 @@ const domParser = {
       '[data-cy="question-title"]', 
       '.text-title-large', 
       '.challenge-title',
-      'h2.title'
+      'h2.title',
+      '.title-name',
+      '.problems_header_content__title'
     ];
     for (const selector of selectors) {
       const el = document.querySelector(selector);
@@ -41,13 +43,16 @@ const domParser = {
   },
 
   getDescription() {
-    // LeetCode specific: .elfjS, .question-content
+    // Universal Problem Statement selectors
     const selectors = [
       '[data-track-load="description_content"]',
       '.elfjS',
       '.question-content',
       '.problem-description',
       '#problem-description',
+      '.problem-statement',
+      '.challenge-body-html',
+      '[class*="problem_content"]',
       'article'
     ];
     for (const selector of selectors) {
@@ -115,13 +120,14 @@ const domParser = {
       rawErrorStr = testResultContainer.innerText.trim();
     }
     
-    // 2. Second choice: Known error classes
+    // 2. Second choice: Known generic error classes across platforms
     if (!rawErrorStr) {
       const selectors = [
         '.text-red-5', '.text-red-6', '.text-red-s',
         '[data-cy="run-code-result-output"]',
         '.console-message-error', '.error-message',
-        '.testcase-error-content', '.error-text'
+        '.testcase-error-content', '.error-text',
+        '.compiler-message', '.test-example-line'
       ];
       for (const selector of selectors) {
         const el = document.querySelector(selector);
