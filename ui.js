@@ -111,10 +111,11 @@ const ui = {
   },
 
   dragStart(e) {
-    this.initialX = e.clientX - this.xOffset;
-    this.initialY = e.clientY - this.yOffset;
-    if (e.target.closest('.header')) {
+    if (e.target.closest('.header') && e.target.id !== 'ai-assistant-settings' && e.target.id !== 'ai-assistant-minimize') {
       this.isDragging = true;
+      e.preventDefault(); // Prevent background text selection while dragging
+      this.initialX = e.clientX - this.xOffset;
+      this.initialY = e.clientY - this.yOffset;
     }
   },
 

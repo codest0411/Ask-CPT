@@ -4,15 +4,16 @@
   top: 20px;
   right: 20px;
   width: 300px;
+  min-width: 250px;
   background-color: #1e1e1e;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  z-index: 10000;
+  z-index: 2147483647;
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow: hidden;
   border: 1px solid #333;
-  transition: all 0.3s ease;
+  resize: both;
 }
 
 #ai-coding-assistant-panel .header {
