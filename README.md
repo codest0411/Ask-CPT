@@ -305,29 +305,25 @@ Inject corrected solution into Monaco Editor
 - A **Groq API Key** → [Get it free at console.groq.com](https://console.groq.com)
 - *(Optional)* An **OpenAI API Key** for fallback → [platform.openai.com](https://platform.openai.com)
 
-### Steps
+### 📥 How to Upload the Extension to Chrome
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-username/ask-cpt-extension.git
-cd ask-cpt-extension
+**Step 1: Download the Code**
+- Click the green **Code** button at the top of this GitHub page and click **Download ZIP**.
+- Extract/Unzip that downloaded folder somewhere on your computer (like your Desktop).
 
-# 2. Set up your config file
-cp config.example.js config.js
-```
+**Step 2: Add your API Keys**
+- Inside the folder you extracted, find the file named `config.example.js`.
+- Rename it to `config.js`.
+- Open `config.js` in any text editor (like Notepad), delete the placeholder text, and paste your actual API keys. Save the file.
+> **⚠️ Important:** `config.js` is set to be ignored by Git. **Never upload your actual API keys to the internet.**
 
-> **⚠️ Important:** `config.js` is listed in `.gitignore`. **Never commit real API keys to GitHub.**
+**Step 3: Upload into Chrome**
+1. Open Google Chrome and type `chrome://extensions/` into the URL bar and hit Enter.
+2. In the top-right corner, turn on the **Developer mode** toggle switch.
+3. In the top-left corner, click the **Load unpacked** button.
+4. A file window will open. Select the folder that you unzipped in Step 1. *(Make sure you are selecting the folder that actually contains the `manifest.json` file!)*
 
-```bash
-# 3. Open Chrome and navigate to:
-chrome://extensions/
-
-# 4. Enable "Developer mode" (toggle in the top-right corner)
-
-# 5. Click "Load unpacked" and select the project folder
-```
-
-You should now see the **Ask CPT** extension icon in your Chrome toolbar. 🎉
+🎉 **You're Done!** You should now see the **Ask CPT** extension icon in your Chrome toolbar. Go to any LeetCode problem to start using it!
 
 ---
 
