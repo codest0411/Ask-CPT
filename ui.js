@@ -103,10 +103,19 @@ const ui = {
       chrome.storage.sync.set({ isMinimized: content.style.display === 'none' });
     });
 
-    // Handle initial minimized state
-    const { isMinimized } = await chrome.storage.sync.get('isMinimized');
+    // Handle initial minimized state and position
+    const { isMinimized, positionX, positionY } = await chrome.storage.sync.get(['isMinimized', 'positionX', 'positionY']);
     if (isMinimized) {
       content.style.display = 'none';
+    }
+    
+    // Restore saved position
+    if (positionX !== undefined && positionY !== undefined) {
+      this.currentX = positionX;
+      this.currentY = positionY;
+      this.xOffset = positionX;
+      this.yOffset = positionY;
+      this.panel.style.transform = `translate3d(${positionX}px, ${positionY}px, 0)`;
     }
   },
 
@@ -131,9 +140,12 @@ const ui = {
   },
 
   dragEnd(e) {
-    this.initialX = this.currentX;
-    this.initialY = this.currentY;
-    this.isDragging = false;
+    if (this.isDragging) {
+      this.initialX = this.currentX;
+      this.initialY = this.currentY;
+      this.isDragging = false;
+      chrome.storage.sync.set({ positionX: this.currentX, positionY: this.currentY });
+    }
   },
 
   setLoading(isLoading) {
