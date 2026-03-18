@@ -3,10 +3,10 @@
  * Injected into the page to interact with Monaco Editor.
  */
 
-(function() {
+(function () {
   function getActiveMonacoModel() {
     if (typeof monaco === 'undefined' || !monaco.editor) return null;
-    
+
     // 1. Prioritize editors that the user is actively engaged with
     if (monaco.editor.getEditors) {
       const editors = monaco.editor.getEditors();
@@ -16,7 +16,7 @@
         if (activeEditor && activeEditor.getModel()) return activeEditor.getModel();
       }
     }
-    
+
     // 2. Fallback to raw models list
     if (monaco.editor.getModels) {
       const models = monaco.editor.getModels();
@@ -24,7 +24,7 @@
       const validModels = models.filter(m => m.getLanguageId() !== 'json');
       if (validModels.length > 0) return validModels[validModels.length - 1]; // Often the latest created model is the actual editor
     }
-    
+
     return null;
   }
 
@@ -46,10 +46,10 @@
     }
 
     // 2. Try Generic Editor (Textarea)
-    const activeTextarea = document.querySelector('textarea:focus-within') || 
-                           document.querySelector('.monaco-editor textarea') ||
-                           document.querySelector('textarea');
-    
+    const activeTextarea = document.querySelector('textarea:focus-within') ||
+      document.querySelector('.monaco-editor textarea') ||
+      document.querySelector('textarea');
+
     if (activeTextarea) {
       if (typingAnimation) {
         typeInTextarea(activeTextarea, code);
@@ -66,14 +66,14 @@
   function typeInMonaco(model, code) {
     // Clear the editor first
     model.setValue("");
-    
+
     let i = 0;
     const interval = setInterval(() => {
       if (i >= code.length) {
         clearInterval(interval);
         return;
       }
-      const chunk = code.slice(i, i + 5); 
+      const chunk = code.slice(i, i + 5);
       const lineCount = model.getLineCount();
       const lastLineColumn = model.getLineMaxColumn(lineCount);
 
