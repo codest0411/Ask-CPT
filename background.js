@@ -5,6 +5,11 @@
  */
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === 'OPEN_OPTIONS_PAGE') {
+    chrome.runtime.openOptionsPage();
+    return true;
+  }
+
   if (request.type === 'AI_ASSISTANT_FETCH') {
     console.log("[Background] Fetching AI Request:", request.payload.url);
     

@@ -29,12 +29,16 @@ const ui = {
     this.panel = document.createElement('div');
     this.panel.id = 'ai-coding-assistant-panel';
     this.panel.style.zIndex = '2147483647'; // Maximum z-index
-    
+
     // Header (The handle for dragging)
     const header = document.createElement('div');
     header.className = 'header';
     header.style.cursor = 'move'; // Show it's draggable
-    header.innerHTML = `<h3>AI Coding Assistant</h3><span style="cursor:pointer;font-size:12px;opacity:0.6" id="ai-assistant-minimize">_</span>`;
+    header.innerHTML = `<h3 style="display:inline-block; margin:0;">Ask CPT</h3>
+      <div style="float:right; margin-top:2px;">
+        <span style="cursor:pointer;font-size:14px;opacity:0.8;margin-right:12px" id="ai-assistant-settings" title="Settings">⚙️</span>
+        <span style="cursor:pointer;font-size:14px;opacity:0.8;font-weight:bold;" id="ai-assistant-minimize" title="Minimize">_</span>
+      </div>`;
     this.panel.appendChild(header);
 
     // Content
@@ -47,7 +51,7 @@ const ui = {
     this.generateBtn = document.createElement('button');
     this.generateBtn.id = 'ai-assistant-generate';
     this.generateBtn.innerHTML = `<span class="loader" id="ai-assistant-loader"></span> Generate Solution`;
-    
+
     this.fixBtn = document.createElement('button');
     this.fixBtn.id = 'ai-assistant-fix';
     this.fixBtn.style.background = '#ff4b4b'; // Red color for Fix
@@ -74,7 +78,7 @@ const ui = {
         Status: 🚀 Drag to Move
       </div>
     `;
-    
+
     content.appendChild(info);
     this.panel.appendChild(content);
 
@@ -89,6 +93,10 @@ const ui = {
     document.addEventListener('mouseup', (e) => this.dragEnd(e));
 
     // Attach events
+    this.panel.querySelector('#ai-assistant-settings').addEventListener('click', () => {
+      chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' });
+    });
+
     this.panel.querySelector('#ai-assistant-minimize').addEventListener('click', () => {
       const content = this.panel.querySelector('.content');
       content.style.display = content.style.display === 'none' ? 'block' : 'none';

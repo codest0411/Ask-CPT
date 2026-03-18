@@ -19,20 +19,37 @@
   "background": {
     "service_worker": "background.js"
   },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "content_scripts": [
     {
       "matches": [
         "*://leetcode.com/*",
         "*://*.leetcode.com/*"
       ],
-      "js": ["config.js", "domParser.js", "aiClient.js", "ui.js", "content.js"],
-      "css": ["styles.css"]
+      "js": [
+        "config.js",
+        "domParser.js",
+        "aiClient.js",
+        "ui.js",
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["editorWriter.js"],
-      "matches": ["http://*/*", "https://*/*"]
+      "resources": [
+        "editorWriter.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
     }
   ]
 }

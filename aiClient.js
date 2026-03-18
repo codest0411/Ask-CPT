@@ -12,16 +12,30 @@ const aiClient = {
     "mistralai/mistral-7b-instruct:free"
   ],
 
+  async getKeys() {
+    return new Promise((resolve) => {
+      chrome.storage.sync.get(['groqKey', 'openaiKey', 'openrouterKey'], (result) => {
+        const config = (typeof window !== 'undefined' && window.ASK_CPT_CONFIG) ? window.ASK_CPT_CONFIG : {};
+        resolve({
+          groqKey: result.groqKey || config.GROQ_API_KEY || "",
+          openaiKey: result.openaiKey || config.OPENAI_API_KEY || "",
+          openrouterKey: result.openrouterKey || config.OPENROUTER_API_KEY || ""
+        });
+      });
+    });
+  },
+
   async generateSolution(problemData, language = 'javascript') {
     const { title, description, examples, constraints } = problemData;
-    
-    const config = window.ASK_CPT_CONFIG || {};
-    const groqKey = config.GROQ_API_KEY || "";
-    const openaiKey = config.OPENAI_API_KEY || "";
-    const openrouterKey = config.OPENROUTER_API_KEY || "";
+
+    const keys = await this.getKeys();
+    const groqKey = keys.groqKey;
+    const openaiKey = keys.openaiKey;
+    const openrouterKey = keys.openrouterKey;
 
     if (!groqKey && !openaiKey) {
-      throw new Error("API Keys missing! Please set them up in config.js");
+      this.updateStatus("❌ Click ⚙️ to add your API Keys");
+      throw new Error("API Keys missing! Click ⚙️ Settings on the AI panel to add them.");
     }
 
     const prompt = `Solve LeetCode: "${title}". ${description}. Language: ${language}. Raw code ONLY.`;
@@ -37,9 +51,9 @@ const aiClient = {
         body: { model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: prompt }], temperature: 0 }
       });
       if (res && res.choices?.[0]?.message?.content) return this.cleanCode(res.choices[0].message.content);
-    } catch (err) { 
-        if (this.isContextError(err)) throw err;
-        errorLog.push(`Groq: ${err.message}`); 
+    } catch (err) {
+      if (this.isContextError(err)) throw err;
+      errorLog.push(`Groq: ${err.message}`);
     }
 
     // 2. Try OpenAI (Backup)
@@ -51,19 +65,19 @@ const aiClient = {
         body: { model: "gpt-4o-mini", messages: [{ role: "user", content: prompt }] }
       });
       if (res && res.choices?.[0]?.message?.content) return this.cleanCode(res.choices[0].message.content);
-    } catch (err) { 
-        if (this.isContextError(err)) throw err;
-        errorLog.push(`OpenAI: ${err.message}`); 
+    } catch (err) {
+      if (this.isContextError(err)) throw err;
+      errorLog.push(`OpenAI: ${err.message}`);
     }
 
     // 3. Try OpenRouter Fallbacks
     for (const model of this.OPENROUTER_MODELS) {
       try {
-        this.updateStatus(`Trying Fallback AI ${this.OPENROUTER_MODELS.indexOf(model)+1}/4...`);
+        this.updateStatus(`Trying Fallback AI ${this.OPENROUTER_MODELS.indexOf(model) + 1}/4...`);
         const res = await this.callBackgroundAI({
           url: "https://openrouter.ai/api/v1/chat/completions",
-          headers: { 
-            "Content-Type": "application/json", 
+          headers: {
+            "Content-Type": "application/json",
             "Authorization": `Bearer ${openrouterKey}`,
             "HTTP-Referer": "https://leetcode.com",
             "X-Title": "AI Assistant"
@@ -71,9 +85,9 @@ const aiClient = {
           body: { model: model, messages: [{ role: "user", content: prompt }] }
         });
         if (res && res.choices?.[0]?.message?.content) return this.cleanCode(res.choices[0].message.content);
-      } catch (err) { 
-          if (this.isContextError(err)) throw err;
-          errorLog.push(`${model}: ${err.message}`); 
+      } catch (err) {
+        if (this.isContextError(err)) throw err;
+        errorLog.push(`${model}: ${err.message}`);
       }
     }
 
@@ -98,9 +112,14 @@ CRITICAL INSTRUCTIONS:
 3. Fix the bug and provide the fully corrected ${language} solution.
 4. Output ONLY the raw code, nothing else. No markdown formatting (\`\`\`), no explanations.`;
 
-    const config = window.ASK_CPT_CONFIG || {};
-    const groqKey = config.GROQ_API_KEY || "";
-    const openaiKey = config.OPENAI_API_KEY || "";
+    const keys = await this.getKeys();
+    const groqKey = keys.groqKey;
+    const openaiKey = keys.openaiKey;
+
+    if (!groqKey && !openaiKey) {
+      this.updateStatus("❌ Click ⚙️ to add your API Keys");
+      throw new Error("API Keys missing! Click ⚙️ Settings on the AI panel to add them.");
+    }
 
     // Try Groq first for fix
     try {
@@ -114,7 +133,7 @@ CRITICAL INSTRUCTIONS:
     } catch (e) {
       console.warn("Groq fix failed", e);
     }
-    
+
     // Fallback to OpenAI if Groq fails
     try {
       this.updateStatus("Fixing code with OpenAI...");
@@ -145,12 +164,12 @@ CRITICAL INSTRUCTIONS:
       try {
         chrome.runtime.sendMessage({ type: 'AI_ASSISTANT_FETCH', payload }, response => {
           if (chrome.runtime.lastError) {
-             const msg = chrome.runtime.lastError.message;
-             if (msg.includes("context invalidated")) {
-                reject(new Error("context invalidated"));
-             } else {
-                reject(new Error("Connection to background failed. Reload extension."));
-             }
+            const msg = chrome.runtime.lastError.message;
+            if (msg.includes("context invalidated")) {
+              reject(new Error("context invalidated"));
+            } else {
+              reject(new Error("Connection to background failed. Reload extension."));
+            }
           } else if (response && response.success) {
             resolve(response.data);
           } else {
@@ -159,9 +178,9 @@ CRITICAL INSTRUCTIONS:
         });
       } catch (e) {
         if (e.message.includes("context invalidated")) {
-           reject(new Error("context invalidated"));
+          reject(new Error("context invalidated"));
         } else {
-           reject(e);
+          reject(e);
         }
       }
     });
@@ -172,7 +191,7 @@ CRITICAL INSTRUCTIONS:
     const blockRegex = /```[a-zA-Z]*\n([\s\S]*?)```/;
     const match = rawCode.match(blockRegex);
     if (match && match[1]) {
-       return match[1].trim();
+      return match[1].trim();
     }
     // Otherwise fallback to stripping any stray backticks just in case
     return rawCode.replace(/```[a-zA-Z]*\n?|```/g, "").trim();
