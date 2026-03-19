@@ -38,6 +38,7 @@
 - [⚙️ Architecture Diagram](#️-architecture-diagram)
 - [🚀 How It Works](#-how-it-works)
 - [🔄 Error Fix Flow](#-error-fix-flow)
+- [🤖 Auto-Solve Mode](#-auto-solve-mode)
 - [🛠️ Installation](#️-installation)
 - [🔑 Getting API Keys](#-getting-api-keys)
 - [📖 Usage Guide](#-usage-guide)
@@ -136,6 +137,34 @@ A lightweight floating control panel that is movable, non-blocking, always visib
 
 ### 🔐 CSP / CORS Bypass
 All API calls are securely relayed through a Manifest V3 Service Worker, intentionally bypassing stringent content security policies placed by LeetCode — keeping your tokens safe and off the page.
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🤖 Auto-Solve Mode (NEW!)
+One-click **fully automated solving**. Click `START AUTO SOLVE` and Ask CPT will:
+1. Read the problem description
+2. Generate a solution via AI
+3. Run local test cases
+4. Auto-fix if tests fail (up to 2 retries)
+5. Submit for final verdict
+6. Wait for **"Accepted"** ✅
+7. Auto-navigate to the **next problem**
+
+Runs infinitely until you click **STOP**.
+
+</td>
+<td width="50%">
+
+### 🛡️ Anti-Ban & Stealth Engine
+Built-in protection system to keep your account safe during Auto-Solve:
+- **Randomized delays** between all actions (mimics human behavior)
+- **API rate-limit retry** — automatically waits and retries (up to 3x) when Groq/OpenAI limits are hit
+- **SPA navigation watcher** — seamlessly detects page changes and continues solving
+- **Instance lock** — prevents duplicate automation runs
+- **Extension crash protection** — all Chrome API calls wrapped in try-catch
 
 </td>
 </tr>
