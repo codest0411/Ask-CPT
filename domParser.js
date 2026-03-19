@@ -28,16 +28,18 @@ const domParser = {
     // LeetCode specific: text-title-large, text-label-1
     const selectors = [
       'h1', 
+      'h3', // Quests often use h3 for Q1, Q2, etc.
       '[data-cy="question-title"]', 
       '.text-title-large', 
       '.challenge-title',
       'h2.title',
       '.title-name',
-      '.problems_header_content__title'
+      '.problems_header_content__title',
+      '[class*="title"]'
     ];
     for (const selector of selectors) {
       const el = document.querySelector(selector);
-      if (el && el.innerText.trim()) return el.innerText.trim();
+      if (el && el.innerText.trim() && el.offsetHeight > 0) return el.innerText.trim();
     }
     return document.title;
   },
@@ -47,17 +49,19 @@ const domParser = {
     const selectors = [
       '[data-track-load="description_content"]',
       '.elfjS',
+      '.problem-content', // Quests use this
       '.question-content',
       '.problem-description',
       '#problem-description',
       '.problem-statement',
       '.challenge-body-html',
       '[class*="problem_content"]',
+      '[class*="description"]',
       'article'
     ];
     for (const selector of selectors) {
       const el = document.querySelector(selector);
-      if (el) return el.innerText.trim();
+      if (el && el.innerText.trim().length > 10) return el.innerText.trim();
     }
 
     // Aggressive Assessment Fallback

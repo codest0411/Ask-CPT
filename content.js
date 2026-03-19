@@ -50,39 +50,49 @@
     if (generateBtn && !generateBtn.getAttribute('data-events-bound')) {
       generateBtn.setAttribute('data-events-bound', 'true');
       generateBtn.addEventListener('click', async () => {
-        try {
-          ui.setLoading(true);
-          const problemData = domParser.extractProblemData();
-          if (!problemData.title || !problemData.description) {
-            throw new Error("Could not detect problem details. Refresh or open a problem page.");
-          }
-
-          const editorContext = await getEditorInfo();
-          let language = editorContext.lang || detectLanguage();
-          if (language === 'python3') language = 'python';
-
-          ui.setStatus(`Generating ${language} solution...`, null);
-          const code = await aiClient.generateSolution(problemData, language);
-
-          ui.setStatus("Writing solution...", null);
-          window.postMessage({ type: 'AI_ASSISTANT_WRITE_CODE', code: code }, '*');
-
-          const onStatus = (event) => {
-            if (event.data && event.data.type === 'AI_ASSISTANT_WRITE_STATUS') {
-              if (event.data.success) {
-                ui.setStatus("Solution inserted successfully!", 3000);
-              } else {
-                ui.setStatus("Failed to find editor.", 5000);
-              }
-              ui.setLoading(false);
-              window.removeEventListener('message', onStatus);
+        const { isStarred } = await chrome.storage.local.get(['isStarred']);
+        
+        const runGeneration = async () => {
+          try {
+            ui.setLoading(true);
+            const problemData = domParser.extractProblemData();
+            if (!problemData.title || !problemData.description) {
+              throw new Error("Could not detect problem details. Refresh or open a problem page.");
             }
-          };
-          window.addEventListener('message', onStatus);
 
-        } catch (error) {
-          ui.setStatus(`Error: ${error.message}`, 10000);
-          ui.setLoading(false);
+            const editorContext = await getEditorInfo();
+            let language = editorContext.lang || detectLanguage();
+            if (language === 'python3') language = 'python';
+
+            ui.setStatus(`Generating ${language} solution...`, null);
+            const code = await aiClient.generateSolution(problemData, language);
+
+            ui.setStatus("Writing solution...", null);
+            window.postMessage({ type: 'AI_ASSISTANT_WRITE_CODE', code: code }, '*');
+
+            const onStatus = (event) => {
+              if (event.data && event.data.type === 'AI_ASSISTANT_WRITE_STATUS') {
+                if (event.data.success) {
+                  ui.setStatus("Solution inserted successfully!", 3000);
+                } else {
+                  ui.setStatus("Failed to find editor.", 5000);
+                }
+                ui.setLoading(false);
+                window.removeEventListener('message', onStatus);
+              }
+            };
+            window.addEventListener('message', onStatus);
+
+          } catch (error) {
+            ui.setStatus(`Error: ${error.message}`, 10000);
+            ui.setLoading(false);
+          }
+        };
+
+        if (!isStarred) {
+          ui.showStarNudge(runGeneration);
+        } else {
+          runGeneration();
         }
       });
     }
@@ -90,44 +100,54 @@
     if (fixBtn && !fixBtn.getAttribute('data-events-bound')) {
       fixBtn.setAttribute('data-events-bound', 'true');
       fixBtn.addEventListener('click', async () => {
-        try {
-          ui.setFixLoading(true);
-          const problemData = domParser.extractProblemData();
-          let errorText = domParser.extractErrorText();
-          
-          if (!errorText || errorText.length < 10) {
-             // Ultimate backup: grab the end of the page where the console usually is
-             errorText = "Raw Page Console Dump:\n" + document.body.innerText.slice(-3000);
-          }
-
-          const editorContext = await getEditorInfo();
-          let language = editorContext.lang || detectLanguage();
-          if (language === 'python3') language = 'python';
-          
-          const currentCode = editorContext.code;
-
-          if (!currentCode) throw new Error("Could not read code. Ensure editor is active.");
-
-          const fixedCode = await aiClient.fixSolution(problemData, currentCode, errorText, language);
-          ui.setStatus("Applying fix...", null);
-          window.postMessage({ type: 'AI_ASSISTANT_WRITE_CODE', code: fixedCode }, '*');
-          
-          const onStatus = (event) => {
-            if (event.data && event.data.type === 'AI_ASSISTANT_WRITE_STATUS') {
-              if (event.data.success) {
-                ui.setStatus("Fix applied successfully!", 3000);
-              } else {
-                ui.setStatus("Failed to write to editor.", 5000);
-              }
-              ui.setFixLoading(false);
-              window.removeEventListener('message', onStatus);
+        const { isStarred } = await chrome.storage.local.get(['isStarred']);
+        
+        const runFix = async () => {
+          try {
+            ui.setFixLoading(true);
+            const problemData = domParser.extractProblemData();
+            let errorText = domParser.extractErrorText();
+            
+            if (!errorText || errorText.length < 10) {
+              // Ultimate backup: grab the end of the page where the console usually is
+              errorText = "Raw Page Console Dump:\n" + document.body.innerText.slice(-3000);
             }
-          };
-          window.addEventListener('message', onStatus);
-          
-        } catch (e) {
-          ui.setStatus(`Fix fail: ${e.message}`, 5000);
-          ui.setFixLoading(false);
+
+            const editorContext = await getEditorInfo();
+            let language = editorContext.lang || detectLanguage();
+            if (language === 'python3') language = 'python';
+            
+            const currentCode = editorContext.code;
+
+            if (!currentCode) throw new Error("Could not read code. Ensure editor is active.");
+
+            const fixedCode = await aiClient.fixSolution(problemData, currentCode, errorText, language);
+            ui.setStatus("Applying fix...", null);
+            window.postMessage({ type: 'AI_ASSISTANT_WRITE_CODE', code: fixedCode }, '*');
+            
+            const onStatus = (event) => {
+              if (event.data && event.data.type === 'AI_ASSISTANT_WRITE_STATUS') {
+                if (event.data.success) {
+                  ui.setStatus("Fix applied successfully!", 3000);
+                } else {
+                  ui.setStatus("Failed to write to editor.", 5000);
+                }
+                ui.setFixLoading(false);
+                window.removeEventListener('message', onStatus);
+              }
+            };
+            window.addEventListener('message', onStatus);
+            
+          } catch (e) {
+            ui.setStatus(`Fix fail: ${e.message}`, 5000);
+            ui.setFixLoading(false);
+          }
+        };
+
+        if (!isStarred) {
+          ui.showStarNudge(runFix);
+        } else {
+          runFix();
         }
       });
     }
