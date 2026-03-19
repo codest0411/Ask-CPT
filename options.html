@@ -112,21 +112,53 @@
     <p>Welcome! Ask CPT requires an API Key to generate code. Your keys are saved securely on your local computer and never tracked.</p>
     
     <div class="form-group">
-      <label for="groqKey">Groq API Key <span class="badge badge-primary">Primary Option</span> <span class="badge badge-fast">Ultra-Fast</span></label>
-      <input type="text" id="groqKey" placeholder="gsk_...">
+      <label for="groqKey">Groq Configuration <span class="badge badge-primary">Primary Option</span> <span class="badge badge-fast">Ultra-Fast</span></label>
+      <input type="text" id="groqKey" placeholder="API Key (gsk_...)" style="margin-bottom: 8px;">
+      <input type="text" id="groqModel" placeholder="Model (default: llama-3.3-70b-versatile)">
       <span class="note">Highly recommended. Get a free key in 5 seconds at <a href="https://console.groq.com/keys" target="_blank">console.groq.com</a></span>
     </div>
 
     <div class="form-group">
-      <label for="openaiKey">OpenAI API Key <span class="badge badge-fallback">Fallback</span></label>
-      <input type="text" id="openaiKey" placeholder="sk-proj-...">
+      <label for="openaiKey">OpenAI Configuration <span class="badge badge-fallback">Fallback</span></label>
+      <input type="text" id="openaiKey" placeholder="API Key (sk-proj-...)" style="margin-bottom: 8px;">
+      <input type="text" id="openaiModel" placeholder="Model (default: gpt-4o-mini)">
       <span class="note">Optional backup. Get one at <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></span>
     </div>
 
     <div class="form-group">
-      <label for="openrouterKey">OpenRouter API Key <span class="badge badge-fallback">Fallback</span></label>
-      <input type="text" id="openrouterKey" placeholder="sk-or-v1-...">
+      <label for="claudeKey">Claude Configuration (Anthropic) <span class="badge badge-fallback">AI</span></label>
+      <input type="text" id="claudeKey" placeholder="API Key (sk-ant-...)" style="margin-bottom: 8px;">
+      <input type="text" id="claudeModel" placeholder="Model (default: claude-3-7-sonnet-latest)">
+      <span class="note">Get an API key at <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></span>
+    </div>
+
+    <div class="form-group">
+      <label for="geminiKey">Google Gemini Configuration <span class="badge badge-fallback">AI</span></label>
+      <input type="text" id="geminiKey" placeholder="API Key (AIza...)" style="margin-bottom: 8px;">
+      <input type="text" id="geminiModel" placeholder="Model (default: gemini-2.5-flash)">
+      <span class="note">Get an API key at <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></span>
+    </div>
+
+    <div class="form-group">
+      <label for="deepseekKey">DeepSeek Configuration <span class="badge badge-fallback">AI</span></label>
+      <input type="text" id="deepseekKey" placeholder="API Key (sk-...)" style="margin-bottom: 8px;">
+      <input type="text" id="deepseekModel" placeholder="Model (default: deepseek-chat)">
+      <span class="note">Get an API key at <a href="https://platform.deepseek.com/" target="_blank">platform.deepseek.com</a></span>
+    </div>
+
+    <div class="form-group">
+      <label for="openrouterKey">OpenRouter Configuration <span class="badge badge-fallback">Fallback</span></label>
+      <input type="text" id="openrouterKey" placeholder="API Key (sk-or-v1-...)" style="margin-bottom: 8px;">
+      <input type="text" id="openrouterModel" placeholder="Model (e.g. meta-llama/llama-3.2-3b-instruct:free)">
       <span class="note">Optional backup. Get one at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai</a></span>
+    </div>
+
+    <div class="form-group">
+      <label for="customKey">Custom Provider (OpenAI Compatible) <span class="badge badge-fallback">Custom</span></label>
+      <input type="text" id="customUrl" placeholder="API URL (e.g. https://api.openai.com/v1/chat/completions)" style="margin-bottom: 8px;">
+      <input type="text" id="customKey" placeholder="API Key (optional)" style="margin-bottom: 8px;">
+      <input type="text" id="customModel" placeholder="Model Name (optional)">
+      <span class="note">Add any custom model and key (e.g. local models, other providers).</span>
     </div>
 
     <button id="saveBtn">Save API Keys</button>
