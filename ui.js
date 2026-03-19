@@ -36,6 +36,7 @@ const ui = {
     header.style.cursor = 'move'; // Show it's draggable
     header.innerHTML = `<h3 style="display:inline-block; margin:0;">Ask CPT</h3>
       <div style="float:right; margin-top:2px;">
+        <span style="cursor:pointer;font-size:14px;opacity:0.8;margin-right:12px" id="ai-assistant-star" title="Star on GitHub">⭐</span>
         <span style="cursor:pointer;font-size:14px;opacity:0.8;margin-right:12px" id="ai-assistant-settings" title="Settings">⚙️</span>
         <span style="cursor:pointer;font-size:14px;opacity:0.8;font-weight:bold;" id="ai-assistant-minimize" title="Minimize">_</span>
       </div>`;
@@ -101,14 +102,18 @@ const ui = {
     document.addEventListener('mouseup', (e) => this.dragEnd(e));
 
     // Attach events
+    this.panel.querySelector('#ai-assistant-star').addEventListener('click', () => {
+      window.open('https://github.com/codest0411/Ask-CPT', '_blank');
+    });
+
     this.panel.querySelector('#ai-assistant-settings').addEventListener('click', () => {
-      try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' }); } catch(e) {}
+      try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' }); } catch (e) { }
     });
 
     this.panel.querySelector('#ai-assistant-minimize').addEventListener('click', () => {
       const content = this.panel.querySelector('.content');
       content.style.display = content.style.display === 'none' ? 'block' : 'none';
-      try { chrome.storage.sync.set({ isMinimized: content.style.display === 'none' }); } catch(e) {}
+      try { chrome.storage.sync.set({ isMinimized: content.style.display === 'none' }); } catch (e) { }
     });
 
     this.autoSolveBtn.addEventListener('click', async () => {
@@ -119,7 +124,7 @@ const ui = {
         } else {
           this.startAutoSolve();
         }
-      } catch(e) {
+      } catch (e) {
         console.warn('Extension context lost. Please refresh the page.');
       }
     });
@@ -134,7 +139,7 @@ const ui = {
     if (isMinimized) {
       content.style.display = 'none';
     }
-    
+
     // Restore saved position
     if (positionX !== undefined && positionY !== undefined) {
       this.currentX = positionX;
@@ -151,7 +156,7 @@ const ui = {
           this.updateQueueCount();
         }
       });
-    } catch(e) {}
+    } catch (e) { }
   },
 
   dragStart(e) {
@@ -179,7 +184,7 @@ const ui = {
       this.initialX = this.currentX;
       this.initialY = this.currentY;
       this.isDragging = false;
-      try { chrome.storage.sync.set({ positionX: this.currentX, positionY: this.currentY }); } catch(e) {}
+      try { chrome.storage.sync.set({ positionX: this.currentX, positionY: this.currentY }); } catch (e) { }
     }
   },
 
@@ -230,7 +235,7 @@ const ui = {
           this.autoSolveBtn.style.background = "#22c55e";
         }
       }
-    } catch(e) {}
+    } catch (e) { }
   },
 
   async startAutoSolve() {
@@ -238,11 +243,11 @@ const ui = {
       await chrome.storage.local.set({ autoSolveActive: true });
       this.updateQueueCount();
       this.setStatus("🚀 Starting Auto Mode...");
-      
+
       if (window.automation && typeof window.automation.runAutoSolveStep === 'function') {
         window.automation.runAutoSolveStep();
       }
-    } catch(e) {
+    } catch (e) {
       this.setStatus("❌ Extension error. Refresh page.");
     }
   },
@@ -252,7 +257,7 @@ const ui = {
       await chrome.storage.local.set({ autoSolveActive: false });
       this.updateQueueCount();
       this.setStatus("🛑 Auto Mode Stopped");
-    } catch(e) {}
+    } catch (e) { }
   }
 };
 
