@@ -40,7 +40,25 @@
       if (typingAnimation) {
         typeInMonaco(activeModel, code);
       } else {
-        activeModel.setValue(code);
+        // Use a more native-like edit operation for Monaco
+        const model = activeModel;
+        model.pushStackElement(); // Create undo point
+        model.pushEditOperations(
+          [],
+          [{
+            range: model.getFullModelRange(),
+            text: code,
+            forceMoveMarkers: true
+          }],
+          () => null
+        );
+        model.pushStackElement(); // End undo point
+        
+        // Trigger a fake input event to be absolutely sure
+        const container = document.querySelector('.monaco-editor');
+        if (container) {
+          container.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       }
       return true;
     }

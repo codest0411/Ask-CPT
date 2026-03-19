@@ -63,8 +63,16 @@ const ui = {
     this.statusEl.className = 'status';
     this.statusEl.id = 'ai-assistant-status';
 
+    this.autoSolveBtn = document.createElement('button');
+    this.autoSolveBtn.id = 'ai-auto-solve-toggle';
+    this.autoSolveBtn.style.background = '#22c55e'; // Green
+    this.autoSolveBtn.style.marginTop = '12px';
+    this.autoSolveBtn.innerText = "START AUTO SOLVE";
+    this.autoSolveBtn.title = "Solve current and auto-jump to next";
+
     buttonContainer.appendChild(this.generateBtn);
     buttonContainer.appendChild(this.fixBtn);
+    buttonContainer.appendChild(this.autoSolveBtn); // Added simple toggle
     buttonContainer.appendChild(this.statusEl);
     content.appendChild(buttonContainer);
 
@@ -94,14 +102,32 @@ const ui = {
 
     // Attach events
     this.panel.querySelector('#ai-assistant-settings').addEventListener('click', () => {
-      chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' });
+      try { chrome.runtime.sendMessage({ type: 'OPEN_OPTIONS_PAGE' }); } catch(e) {}
     });
 
     this.panel.querySelector('#ai-assistant-minimize').addEventListener('click', () => {
       const content = this.panel.querySelector('.content');
       content.style.display = content.style.display === 'none' ? 'block' : 'none';
-      chrome.storage.sync.set({ isMinimized: content.style.display === 'none' });
+      try { chrome.storage.sync.set({ isMinimized: content.style.display === 'none' }); } catch(e) {}
     });
+
+    this.autoSolveBtn.addEventListener('click', async () => {
+      try {
+        const data = await chrome.storage.local.get(['autoSolveActive']);
+        if (data.autoSolveActive) {
+          this.stopAutoSolve();
+        } else {
+          this.startAutoSolve();
+        }
+      } catch(e) {
+        console.warn('Extension context lost. Please refresh the page.');
+      }
+    });
+
+    // Initial state count update
+    this.updateQueueCount();
+
+    // Handle initial minimized state and position
 
     // Handle initial minimized state and position
     const { isMinimized, positionX, positionY } = await chrome.storage.sync.get(['isMinimized', 'positionX', 'positionY']);
@@ -117,6 +143,15 @@ const ui = {
       this.yOffset = positionY;
       this.panel.style.transform = `translate3d(${positionX}px, ${positionY}px, 0)`;
     }
+
+    // Listen for storage changes to sync UI
+    try {
+      chrome.storage.onChanged.addListener((changes) => {
+        if (changes.autoSolveActive) {
+          this.updateQueueCount();
+        }
+      });
+    } catch(e) {}
   },
 
   dragStart(e) {
@@ -144,7 +179,7 @@ const ui = {
       this.initialX = this.currentX;
       this.initialY = this.currentY;
       this.isDragging = false;
-      chrome.storage.sync.set({ positionX: this.currentX, positionY: this.currentY });
+      try { chrome.storage.sync.set({ positionX: this.currentX, positionY: this.currentY }); } catch(e) {}
     }
   },
 
@@ -181,6 +216,43 @@ const ui = {
         }
       }, timeout);
     }
+  },
+
+  async updateQueueCount() {
+    try {
+      const { autoSolveActive = false } = await chrome.storage.local.get(['autoSolveActive']);
+      if (this.autoSolveBtn) {
+        if (autoSolveActive) {
+          this.autoSolveBtn.innerText = "STOP AUTO MODE";
+          this.autoSolveBtn.style.background = "#ff4b4b";
+        } else {
+          this.autoSolveBtn.innerText = "START AUTO SOLVE";
+          this.autoSolveBtn.style.background = "#22c55e";
+        }
+      }
+    } catch(e) {}
+  },
+
+  async startAutoSolve() {
+    try {
+      await chrome.storage.local.set({ autoSolveActive: true });
+      this.updateQueueCount();
+      this.setStatus("🚀 Starting Auto Mode...");
+      
+      if (window.automation && typeof window.automation.runAutoSolveStep === 'function') {
+        window.automation.runAutoSolveStep();
+      }
+    } catch(e) {
+      this.setStatus("❌ Extension error. Refresh page.");
+    }
+  },
+
+  async stopAutoSolve() {
+    try {
+      await chrome.storage.local.set({ autoSolveActive: false });
+      this.updateQueueCount();
+      this.setStatus("🛑 Auto Mode Stopped");
+    } catch(e) {}
   }
 };
 

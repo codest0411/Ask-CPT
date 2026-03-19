@@ -10,6 +10,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
+  // --- Auto-Solve Queue Management ---
+  if (request.type === 'AUTO_SOLVE_NEXT') {
+    handleAutoSolveNext(sender.tab.id);
+    return true;
+  }
+
   if (request.type === 'AI_ASSISTANT_FETCH') {
     console.log("[Background] Fetching AI Request:", request.payload.url);
     
@@ -26,6 +32,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep channel alive for async response
   }
 });
+
+async function handleAutoSolveNext(tabId) {
+  const data = await chrome.storage.local.get(['autoSolveQueue', 'autoSolveActive']);
+  
+  if (!data.autoSolveActive) return;
+  
+  const queue = data.autoSolveQueue || [];
+  if (queue.length === 0) {
+    console.log("[Auto-Solve] Queue finished!");
+    await chrome.storage.local.set({ autoSolveActive: false });
+    return;
+  }
+  
+  const nextUrl = queue.shift(); // Take the first URL
+  await chrome.storage.local.set({ autoSolveQueue: queue });
+  
+  console.log("[Auto-Solve] Navigating to next:", nextUrl);
+  chrome.tabs.update(tabId, { url: nextUrl });
+}
 
 async function handleAIFetch(payload) {
   const { url, headers, body } = payload;
