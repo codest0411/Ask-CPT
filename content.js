@@ -299,11 +299,12 @@
           
           // Strategy 2: Find the '>' arrow button in the header area
           if (!nextBtn) {
-            const arrows = Array.from(document.querySelectorAll('button, a, div[role="button"]'));
+            const arrows = Array.from(document.querySelectorAll('button, a, div[role="button"], span'));
             nextBtn = arrows.find(el => {
               const text = el.innerText?.trim();
               const ariaLabel = el.getAttribute('aria-label')?.toLowerCase() || '';
-              return (text === '>' || text === '›' || text === '→' || ariaLabel.includes('next'));
+              // Match '>', 'Next >', or 'Next' specifically to catch Quest/Quiz headers
+              return (text === '>' || text === 'Next >' || text === 'Next' || text === '›' || text === '→' || ariaLabel.includes('next'));
             });
           }
 
