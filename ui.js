@@ -16,7 +16,6 @@ const ui = {
   initialY: 0,
   xOffset: 0,
   yOffset: 0,
-  starNudge: null, // The popup element
 
   async build() {
     if (this.panel) {
@@ -92,18 +91,6 @@ const ui = {
     content.appendChild(info);
     this.panel.appendChild(content);
 
-    // 5. Star Nudge Overlay
-    this.starNudge = document.createElement('div');
-    this.starNudge.className = 'star-nudge-overlay';
-    this.starNudge.innerHTML = `
-      <div style="font-size: 24px; margin-bottom: 10px;">⭐</div>
-      <h4>Support the Project!</h4>
-      <p>This tool is 100% free. Please take 2 seconds to star us on GitHub to support our work!</p>
-      <button class="nudge-btn-star" id="nudge-star-btn">Star on GitHub</button>
-      <button class="nudge-btn-later" id="nudge-later-btn">Maybe later</button>
-    `;
-    this.panel.appendChild(this.starNudge);
-
     document.body.appendChild(this.panel);
 
     this.loader = this.panel.querySelector('#ai-assistant-loader');
@@ -113,21 +100,6 @@ const ui = {
     header.addEventListener('mousedown', (e) => this.dragStart(e));
     document.addEventListener('mousemove', (e) => this.drag(e));
     document.addEventListener('mouseup', (e) => this.dragEnd(e));
-
-    // Star Nudge Events
-    this.panel.querySelector('#nudge-star-btn').addEventListener('click', () => {
-      window.open('https://github.com/codest0411/Ask-CPT', '_blank');
-      try { 
-        chrome.storage.local.set({ isStarred: true }); 
-      } catch (e) { }
-      this.hideStarNudge();
-      if (this.nudgeCallback) this.nudgeCallback();
-    });
-
-    this.panel.querySelector('#nudge-later-btn').addEventListener('click', () => {
-      this.hideStarNudge();
-      if (this.nudgeCallback) this.nudgeCallback();
-    });
 
     // Header Events
     this.panel.querySelector('#ai-assistant-star').addEventListener('click', () => {
@@ -288,14 +260,6 @@ const ui = {
     } catch (e) { }
   },
 
-  showStarNudge(callback) {
-    this.nudgeCallback = callback;
-    if (this.starNudge) this.starNudge.style.display = 'flex';
-  },
-
-  hideStarNudge() {
-    if (this.starNudge) this.starNudge.style.display = 'none';
-  }
 };
 
 window.ui = ui;

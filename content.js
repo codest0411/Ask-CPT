@@ -50,8 +50,6 @@
     if (generateBtn && !generateBtn.getAttribute('data-events-bound')) {
       generateBtn.setAttribute('data-events-bound', 'true');
       generateBtn.addEventListener('click', async () => {
-        const { isStarred } = await chrome.storage.local.get(['isStarred']);
-        
         const runGeneration = async () => {
           try {
             ui.setLoading(true);
@@ -89,19 +87,13 @@
           }
         };
 
-        if (!isStarred) {
-          ui.showStarNudge(runGeneration);
-        } else {
-          runGeneration();
-        }
+        runGeneration();
       });
     }
 
     if (fixBtn && !fixBtn.getAttribute('data-events-bound')) {
       fixBtn.setAttribute('data-events-bound', 'true');
       fixBtn.addEventListener('click', async () => {
-        const { isStarred } = await chrome.storage.local.get(['isStarred']);
-        
         const runFix = async () => {
           try {
             ui.setFixLoading(true);
@@ -144,11 +136,7 @@
           }
         };
 
-        if (!isStarred) {
-          ui.showStarNudge(runFix);
-        } else {
-          runFix();
-        }
+        runFix();
       });
     }
   }
