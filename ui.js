@@ -85,8 +85,8 @@ const ui = {
         ⚡ <b>ULTRA-FAST MODE ENABLED</b><br>
         Brain: Groq (Llama 3.3 70B)<br>
         Status: 🚀 Drag to Move
-        IF Auto Got Stop, Then Take Help From ChatGPT and try next question !!
-        Happy Coding !!
+        <p>IF Auto Got Stop, Then Take Help From ChatGPT and try next question !!</p>
+        <p style="text-align: center;"><b>Happy Coding !!</b></p>
       </div>
     `;
 
